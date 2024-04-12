@@ -22,6 +22,16 @@ public class SoundSystem : ScriptableObject
     {
         return Volume;
     }
+
+    public bool IsPlayingClip(AudioClip clip)
+    {
+        if (_musicAudio == null)
+        {
+            return false;
+        }
+
+        return _musicAudio.clip == clip;
+    }
     
     private AudioSource _musicAudio;
     public void PlayMusicClip(AudioClip clip, float fadeTime = 0.5f)
