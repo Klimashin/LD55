@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -52,6 +53,16 @@ public class SoundSystem : ScriptableObject
 
                 _musicAudio.DOFade(1f, fadeTime);
             });
+    }
+
+    public void FadeCurrentMusic(float fadeTime)
+    {
+        if (_musicAudio == null)
+        {
+            return;
+        }
+
+        _musicAudio.DOFade(0f, fadeTime);
     }
 
     private readonly List<AudioSource> _oneShotAudio = new ();

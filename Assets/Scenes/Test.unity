@@ -9637,6 +9637,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _globalLight: {fileID: 1230999960}
+  _allLights:
+  - {fileID: 1230999960}
+  - {fileID: 1860530016}
+  - {fileID: 1041868853}
+  - {fileID: 200437976}
+  - {fileID: 252192149}
+  - {fileID: 880032544}
 --- !u!1 &1568718941
 GameObject:
   m_ObjectHideFlags: 0

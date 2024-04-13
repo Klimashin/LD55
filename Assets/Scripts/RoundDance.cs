@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using Reflex.Attributes;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class RoundDance : MonoBehaviour
 {
@@ -29,6 +30,7 @@ public class RoundDance : MonoBehaviour
 
     public float ErrorRate { get; private set; } = 0f;
     public float ErrorRateNormalized => ErrorRate / _maxErrorRate;
+    public bool IsGameOver => ErrorRate >= _maxErrorRate;
 
     [Inject]
     private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player, LightsController lightsController)
@@ -43,7 +45,8 @@ public class RoundDance : MonoBehaviour
     {
         WaitingForPlayer,
         Started,
-        Finished
+        Finished,
+        GameOver
     }
 
     private void Start()
@@ -104,11 +107,33 @@ public class RoundDance : MonoBehaviour
         {
             var segment = segmentsQueue.Dequeue();
             await PlaySegment(segment);
+
+            if (IsGameOver)
+            {
+                GameOverRoutine().Forget();
+                return;
+            }
         }
 
+        GameCompletedRoutine().Forget();
+    }
+
+    private async UniTaskVoid GameOverRoutine()
+    {
+        State = DanceState.GameOver;
+        _player.SetLookTransform(null);
+        _soundSystem.FadeCurrentMusic(1f);
+        await _lightsController.LightsOff(1f);
+        await UniTask.Delay(TimeSpan.FromSeconds(2f));
+
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    private async UniTaskVoid GameCompletedRoutine()
+    {
         State = DanceState.Finished;
         _player.SetLookTransform(null);
-        _lightsController.SetGlobalIntensity(3f, 2f).Forget();
+        await _lightsController.SetGlobalIntensity(3f, 2f);
     }
 
     private async UniTask PlaySegment(DanceSegment segment)
@@ -122,6 +147,11 @@ public class RoundDance : MonoBehaviour
 
         while (duration < segment.Duration)
         {
+            if (IsGameOver)
+            {
+                return;
+            }
+            
             var normalizedTime = duration / segment.Duration;
             for (var i = 0; i < _dancers.Length; i++)
             {
