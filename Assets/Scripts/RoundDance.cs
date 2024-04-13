@@ -11,7 +11,6 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private int _dancersCount;
     [SerializeField] private int _playerPosition;
     [SerializeField] private List<DanceSegment> _danceSegments;
-    [SerializeField] private Vector3 Center;
     [SerializeField] private float _initialRadius;
     [SerializeField] private float _errorDelta = 0.5f;
     [SerializeField] private float _errorUpDistanceCoefficient = 3f;
@@ -28,6 +27,7 @@ public class RoundDance : MonoBehaviour
     private Vector3 PlayerExpectedPosition => _dancers[_playerPosition].transform.position;
     private DanceState State { get; set; } = DanceState.WaitingForPlayer;
 
+    public Vector3 Center => transform.position;
     public float ErrorRate { get; private set; } = 0f;
     public float ErrorRateNormalized => ErrorRate / _maxErrorRate;
     public bool IsGameOver => ErrorRate >= _maxErrorRate;
@@ -139,10 +139,18 @@ public class RoundDance : MonoBehaviour
     private async UniTask PlaySegment(DanceSegment segment)
     {
         float duration = 0f;
-        float[] radiusOnStart = new float[_dancers.Length];
+        List<List<IDanceMovementHandler>> handlers = new();
         for (var i = 0; i < _dancers.Length; i++)
         {
-            radiusOnStart[i] = (_dancers[i].transform.position - Center).magnitude;
+            var dancerHandlers = new List<IDanceMovementHandler>();
+            foreach (var segmentMovement in segment.Movements)
+            {
+                var handler = segmentMovement.GetHandler(this, _dancers[i]);
+                dancerHandlers.Add(handler);
+                handler.OnStartSegment();
+            }
+            
+            handlers.Add(dancerHandlers);
         }
 
         while (duration < segment.Duration)
@@ -153,21 +161,26 @@ public class RoundDance : MonoBehaviour
             }
             
             var normalizedTime = duration / segment.Duration;
-            for (var i = 0; i < _dancers.Length; i++)
+            var deltaTime = Time.deltaTime;
+            foreach (var dancerHandlers in handlers)
             {
-                var deltaTime = Time.deltaTime;
-                var dancerPosition = _dancers[i].transform.position;
-                foreach (var segmentMovement in segment.Movements)
+                foreach (var handler in dancerHandlers)
                 {
-                    dancerPosition = segmentMovement.GetNextPosition(Center, radiusOnStart[i], dancerPosition, deltaTime, normalizedTime);
+                    handler.HandleDancerPosition(deltaTime, normalizedTime);
                 }
-
-                _dancers[i].transform.position = dancerPosition;
             }
 
             duration += Time.deltaTime;
 
             await UniTask.DelayFrame(1, PlayerLoopTiming.Update, destroyCancellationToken);
+        }
+        
+        foreach (var dancerHandlers in handlers)
+        {
+            foreach (var handler in dancerHandlers)
+            {
+                handler.OnEndSegment();
+            }
         }
     }
 

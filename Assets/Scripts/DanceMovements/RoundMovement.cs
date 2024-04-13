@@ -7,19 +7,31 @@ public class RoundMovement : DanceMovement
     public float AngularVelocity;
     public AnimationCurve VelocityCurve;
 
-    public override Vector3 GetNextPosition(Vector3 center, float radiusOnStart, Vector3 currentPosition, float deltaTime, float normalizedTime)
+    public override IDanceMovementHandler GetHandler(RoundDance dance, Dancer dancer)
     {
-        var radius = (currentPosition - center).magnitude;
-        var velocity = VelocityCurve.Evaluate(normalizedTime) * Mathf.Deg2Rad * AngularVelocity;
+        return new RoundMovementHandler(this, dance, dancer);
+    }
+}
+
+public class RoundMovementHandler : DanceMovementHandler<RoundMovement>
+{
+    public RoundMovementHandler(DanceMovement movement, RoundDance dance, Dancer dancer) : base(movement, dance, dancer)
+    {
+    }
+    
+    public override void HandleDancerPosition(float deltaTime, float normalizedTime)
+    {
+        var currentPosition = dancer.transform.position;
+        var radius = (currentPosition - dance.Center).magnitude;
+        var velocity = movement.VelocityCurve.Evaluate(normalizedTime) * Mathf.Deg2Rad * movement.AngularVelocity;
         var currentAngle = Mathf.Atan2(currentPosition.y, currentPosition.x);
         var deltaAngle = velocity * deltaTime;
-        if (IsClockwise)
+        if (movement.IsClockwise)
         {
             deltaAngle *= -1;
         }
 
         var angle = currentAngle + deltaAngle;
-        var result = Utils.GetPointOnCircle(center, radius, angle);
-        return result;
+        dancer.transform.position = Utils.GetPointOnCircle(dance.Center, radius, angle);
     }
 }

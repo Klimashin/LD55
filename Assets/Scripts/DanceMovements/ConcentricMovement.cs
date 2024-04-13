@@ -4,12 +4,24 @@ using UnityEngine;
 public class ConcentricMovement : DanceMovement
 {
     public float TargetRadius;
-    
-    public override Vector3 GetNextPosition(Vector3 center, float radiusOnStart, Vector3 currentPosition, float deltaTime, float normalizedTime)
+
+    public override IDanceMovementHandler GetHandler(RoundDance dance, Dancer dancer)
     {
-        var radius = Mathf.Lerp(radiusOnStart, TargetRadius, normalizedTime);
+        return new ConcentricMovementHandler(this, dance, dancer);
+    }
+}
+
+public class ConcentricMovementHandler : DanceMovementHandler<ConcentricMovement>
+{
+    public ConcentricMovementHandler(DanceMovement movement, RoundDance dance, Dancer dancer) : base(movement, dance, dancer)
+    {
+    }
+
+    public override void HandleDancerPosition(float deltaTime, float normalizedTime)
+    {
+        var radius = Mathf.Lerp(radiusOnStart, movement.TargetRadius, normalizedTime);
+        var currentPosition = dancer.transform.position;
         var currentAngle = Mathf.Atan2(currentPosition.y, currentPosition.x);
-        var result = Utils.GetPointOnCircle(center, radius, currentAngle);
-        return result;
+        dancer.transform.position = Utils.GetPointOnCircle(dance.Center, radius, currentAngle);
     }
 }
