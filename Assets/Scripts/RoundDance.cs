@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
-using Sirenix.OdinInspector;
+using Reflex.Attributes;
 using UnityEngine;
 
 public class RoundDance : MonoBehaviour
@@ -12,20 +12,30 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private List<DanceSegment> _danceSegments;
     [SerializeField] private Vector3 Center;
     [SerializeField] private float _initialRadius;
-    [SerializeField] private Character _player;
     [SerializeField] private float _errorDelta = 0.5f;
     [SerializeField] private float _errorUpDistanceCoefficient = 3f;
     [SerializeField] private float _errorUpRate = 2f;
     [SerializeField] private float _errorDownRate = 1f;
     [SerializeField] private float _maxErrorRate = 1000f;
-    
+    [SerializeField] private AudioClip _audio1;
 
+    private SoundSystem _soundSystem;
+    private CameraController _cameraController;
+    private Character _player;
     private GameObject[] _dancers;
     private Vector3 PlayerExpectedPosition => _dancers[_playerPosition].transform.position;
     private DanceState State { get; set; } = DanceState.WaitingForPlayer;
 
     public float ErrorRate { get; private set; } = 0f;
     public float ErrorRateNormalized => ErrorRate / _maxErrorRate;
+
+    [Inject]
+    private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player)
+    {
+        _soundSystem = soundSystem;
+        _cameraController = cameraController;
+        _player = player;
+    }
 
     private enum DanceState
     {
@@ -80,16 +90,10 @@ public class RoundDance : MonoBehaviour
         }
     }
 
-    /*[Button]
-    public void Play()
-    {
-        InstantiateDancers();
-        
-        Dance().Forget();
-    }*/
-
     private async UniTask Dance()
     {
+        _cameraController.SetCamera(CameraController.CameraType.Dance);
+        _soundSystem.PlayMusicClip(_audio1);
         State = DanceState.Started;
 
         var segmentsQueue = new Queue<DanceSegment>(_danceSegments);
@@ -157,6 +161,12 @@ public class RoundDance : MonoBehaviour
                 dancer.gameObject.SetActive(false);
             }
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawSphere(transform.position, 1f);
     }
 }
 

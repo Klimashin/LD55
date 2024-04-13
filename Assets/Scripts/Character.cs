@@ -1,15 +1,23 @@
-using System;
+using Reflex.Attributes;
 using UnityEngine;
 
 public class Character : MonoBehaviour
 {
-    [SerializeField] private Camera _camera;
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _acceleration;
     [SerializeField] private float _deadZone;
     [SerializeField] private float _speedCutDistance;
 
+    private MovementZone _movementZone;
+    private Camera _camera;
     private float _currentSpeed;
+
+    [Inject]
+    private void Inject(MovementZone movementZone, Camera mainCamera)
+    {
+        _movementZone = movementZone;
+        _camera = mainCamera;
+    }
 
     private void Update()
     {
@@ -22,6 +30,7 @@ public class Character : MonoBehaviour
 
         var mouseWorldPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPoint.z = 0f;
+
         var distance = Vector3.Distance(mouseWorldPoint, transform.position);
         if (distance <= _deadZone)
         {
@@ -39,7 +48,13 @@ public class Character : MonoBehaviour
         {
             _currentSpeed = maxSpeed;
         }
-        
-        transform.Translate((mouseWorldPoint - transform.position).normalized * (_currentSpeed * Time.deltaTime));
+
+        var currentPosition = transform.position;
+        var translation = (mouseWorldPoint - currentPosition).normalized * (_currentSpeed * Time.deltaTime);
+        var targetPosition = currentPosition + translation;
+        if (_movementZone.IsPointInZone(targetPosition))
+        {
+            transform.Translate(translation);
+        }
     }
 }
