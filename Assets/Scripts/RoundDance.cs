@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RoundDance : MonoBehaviour
 {
-    [SerializeField] private GameObject _dancerPrefab;
+    [SerializeField] private Dancer _dancerPrefab;
     [SerializeField] private int _dancersCount;
     [SerializeField] private int _playerPosition;
     [SerializeField] private List<DanceSegment> _danceSegments;
@@ -21,8 +21,9 @@ public class RoundDance : MonoBehaviour
 
     private SoundSystem _soundSystem;
     private CameraController _cameraController;
+    private LightsController _lightsController;
     private Character _player;
-    private GameObject[] _dancers;
+    private Dancer[] _dancers;
     private Vector3 PlayerExpectedPosition => _dancers[_playerPosition].transform.position;
     private DanceState State { get; set; } = DanceState.WaitingForPlayer;
 
@@ -30,10 +31,11 @@ public class RoundDance : MonoBehaviour
     public float ErrorRateNormalized => ErrorRate / _maxErrorRate;
 
     [Inject]
-    private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player)
+    private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player, LightsController lightsController)
     {
         _soundSystem = soundSystem;
         _cameraController = cameraController;
+        _lightsController = lightsController;
         _player = player;
     }
 
@@ -55,7 +57,7 @@ public class RoundDance : MonoBehaviour
         {
             if (IsPlayerInPlace())
             {
-                Dance().Forget();
+                DanceRoutine().Forget();
             }
 
             return;
@@ -90,10 +92,11 @@ public class RoundDance : MonoBehaviour
         }
     }
 
-    private async UniTask Dance()
+    private async UniTask DanceRoutine()
     {
         _cameraController.SetCamera(CameraController.CameraType.Dance);
         _soundSystem.PlayMusicClip(_audio1);
+        _player.SetLookTransform(transform);
         State = DanceState.Started;
 
         var segmentsQueue = new Queue<DanceSegment>(_danceSegments);
@@ -104,6 +107,8 @@ public class RoundDance : MonoBehaviour
         }
 
         State = DanceState.Finished;
+        _player.SetLookTransform(null);
+        _lightsController.SetGlobalIntensity(3f, 2f).Forget();
     }
 
     private async UniTask PlaySegment(DanceSegment segment)
@@ -146,13 +151,14 @@ public class RoundDance : MonoBehaviour
             }
         }
         
-        _dancers = new GameObject[_dancersCount];
+        _dancers = new Dancer[_dancersCount];
         float angle = 0f;
         float deltaAngle = 2 * Mathf.PI / _dancersCount;
         for (int i = 0; i < _dancersCount; i++)
         {
             var dancer = Instantiate(_dancerPrefab);
             dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle);
+            dancer.SetLookTransform(transform);
             _dancers[i] = dancer;
             angle += deltaAngle;
 
