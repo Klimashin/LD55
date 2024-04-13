@@ -1293,9 +1293,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _camera: {fileID: 910545005}
-  _maxSpeed: 4
+  _maxSpeed: 6
   _acceleration: 4
   _deadZone: 0.3
+  _speedCutDistance: 2
 --- !u!1 &1447942547
 GameObject:
   m_ObjectHideFlags: 0

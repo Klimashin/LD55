@@ -7,31 +7,39 @@ public class Character : MonoBehaviour
     [SerializeField] private float _maxSpeed;
     [SerializeField] private float _acceleration;
     [SerializeField] private float _deadZone;
+    [SerializeField] private float _speedCutDistance;
 
     private float _currentSpeed;
 
     private void Update()
     {
-        bool isMoving = Input.GetMouseButton(0);
+        bool isMoving = !Input.GetMouseButton(0);
         if (!isMoving)
         {
             _currentSpeed = 0f;
             return;
         }
 
-        var targetWorldPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
-        if ((targetWorldPoint - transform.position).magnitude <= _deadZone)
+        var mouseWorldPoint = _camera.ScreenToWorldPoint(Input.mousePosition);
+        mouseWorldPoint.z = 0f;
+        var distance = Vector3.Distance(mouseWorldPoint, transform.position);
+        if (distance <= _deadZone)
         {
             return;
         }
-        
-        targetWorldPoint.z = 0f;
-        _currentSpeed += _acceleration * Time.deltaTime;
-        if (_currentSpeed > _maxSpeed)
+
+        var maxSpeed = _maxSpeed;
+        if (distance <= _speedCutDistance)
         {
-            _currentSpeed = _maxSpeed;
+            maxSpeed = Mathf.Lerp(_maxSpeed, 0f, (_speedCutDistance - distance) / _speedCutDistance);
         }
         
-        transform.Translate((targetWorldPoint - transform.position).normalized * (_currentSpeed * Time.deltaTime));
+        _currentSpeed += _acceleration * Time.deltaTime;
+        if (_currentSpeed > maxSpeed)
+        {
+            _currentSpeed = maxSpeed;
+        }
+        
+        transform.Translate((mouseWorldPoint - transform.position).normalized * (_currentSpeed * Time.deltaTime));
     }
 }

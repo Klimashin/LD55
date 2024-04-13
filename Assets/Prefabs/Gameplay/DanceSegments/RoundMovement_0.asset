@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: RoundMovement_0
   m_EditorClassIdentifier: 
   IsClockwise: 1
-  AngularVelocity: 60
+  AngularVelocity: 30
   VelocityCurve:
     serializedVersion: 2
     m_Curve:
