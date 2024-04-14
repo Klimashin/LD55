@@ -201,9 +201,13 @@ public class RoundDance : MonoBehaviour
         for (int i = 0; i < _dancersCount; i++)
         {
             var dancer = Instantiate(_dancerPrefab);
-            dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle)
-                                        + new Vector3(UnityEngine.Random.Range(-_positionError, _positionError),
-                                            UnityEngine.Random.Range(-_positionError, _positionError), 0f);
+            dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle);
+            if (i != _playerPosition)
+            {
+                dancer.transform.position += new Vector3(UnityEngine.Random.Range(-_positionError, _positionError),
+                    UnityEngine.Random.Range(-_positionError, _positionError), 0f);
+            }
+
             dancer.SetLookTransform(transform);
             _dancers[i] = dancer;
             angle += deltaAngle;
