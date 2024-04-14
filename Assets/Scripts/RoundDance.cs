@@ -266,6 +266,8 @@ public class RoundDance : MonoBehaviour
         }
         
         await _dragAnimator.AnimateDrag(Center, targets);
+        
+        _eyesController.OnErrorRateUpdated(0f);
 
         _player.enabled = true;
         
