@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1d9d04ad914da7343b36005df809eae7, type: 3}
+  m_Name: test_RoundMovement_0 2_vs
+  m_EditorClassIdentifier: 
+  IsClockwise: 0
+  AngularVelocity: 35
+  VelocityCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.0027820969
+      value: 0.49962598
+      inSlope: 2.9023063
+      outSlope: 2.9023063
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.022113012
+    - serializedVersion: 3
+      time: 0.99635774
+      value: 0.5995288
+      inSlope: -1.2982066
+      outSlope: -1.2982066
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.049382724
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
