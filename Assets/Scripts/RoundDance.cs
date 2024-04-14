@@ -321,6 +321,7 @@ public class RoundDance : MonoBehaviour
 [Serializable]
 public class DanceSegment
 {
+    public string Name;
     public float Duration;
     public int ActiveLoop = 0;
     public int[] Tracks = new int[] { 0 };
