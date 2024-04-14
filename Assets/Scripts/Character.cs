@@ -9,16 +9,14 @@ public class Character : MonoBehaviour
     [SerializeField] private float _deadZone;
     [SerializeField] private float _speedCutDistance;
     [SerializeField] private Transform _rendererTransform;
-
-    private MovementZone _movementZone;
+    
     private Camera _camera;
     private float _currentSpeed;
     [CanBeNull] private Transform _lookTransform;
 
     [Inject]
-    private void Inject(MovementZone movementZone, Camera mainCamera)
+    private void Inject(Camera mainCamera)
     {
-        _movementZone = movementZone;
         _camera = mainCamera;
     }
 
@@ -60,13 +58,11 @@ public class Character : MonoBehaviour
         var currentPosition = transform.position;
         var translation = (mouseWorldPoint - currentPosition).normalized * (_currentSpeed * Time.deltaTime);
         var targetPosition = currentPosition + translation;
-        if (_movementZone.IsPointInZone(targetPosition))
-        {
-            var lookDirection = _lookTransform != null
-                ? (currentPosition - _lookTransform.position).normalized
-                : translation.normalized;
-            _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
-            transform.Translate(translation);
-        }
+        
+        var lookDirection = _lookTransform != null
+            ? (currentPosition - _lookTransform.position).normalized
+            : translation.normalized;
+        _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
+        transform.Translate(translation);
     }
 }
