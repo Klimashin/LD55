@@ -21,6 +21,14 @@ public class LightsController : MonoBehaviour
         }
     }
 
+    public void DisableShadows()
+    {
+        foreach (var light2D in _allLights)
+        {
+            light2D.shadowsEnabled = false;
+        }
+    }
+
     public async UniTask LightsOff(float time)
     {
         float currentTime = 0f;

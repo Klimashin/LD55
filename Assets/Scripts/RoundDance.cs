@@ -135,6 +135,7 @@ public class RoundDance : MonoBehaviour
         State = DanceState.Finished;
         _player.SetLookTransform(null);
         await _lightsController.SetGlobalIntensity(3f, 2f);
+        _lightsController.DisableShadows();
     }
 
     private async UniTask PlaySegment(DanceSegment segment)
@@ -201,6 +202,7 @@ public class RoundDance : MonoBehaviour
         for (int i = 0; i < _dancersCount; i++)
         {
             var dancer = Instantiate(_dancerPrefab);
+            dancer.SetIndex(i);
             dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle);
             if (i != _playerPosition)
             {
@@ -208,7 +210,7 @@ public class RoundDance : MonoBehaviour
                     UnityEngine.Random.Range(-_positionError, _positionError), 0f);
             }
 
-            dancer.SetLookTransform(transform);
+            dancer.SetLookTransform(transform.position);
             _dancers[i] = dancer;
             angle += deltaAngle;
 

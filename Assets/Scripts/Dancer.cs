@@ -5,12 +5,18 @@ public class Dancer : MonoBehaviour
 {
     [SerializeField] private Transform _rendererTransform;
     [SerializeField] private Animator _animator;
-    [CanBeNull] private Transform _lookTransform;
-
-    private Vector3 _prevFramePos;
-    private static readonly int DressAnimateHash = Animator.StringToHash("AnimateDress");
+    [CanBeNull] private Vector3? _lookTransform;
     
-    public void SetLookTransform([CanBeNull] Transform t)
+    private static readonly int DressAnimateHash = Animator.StringToHash("AnimateDress");
+
+    public int Index { get; private set; }
+
+    public void SetIndex(int index)
+    {
+        Index = index;
+    }
+
+    public void SetLookTransform([CanBeNull] Vector3? t)
     {
         _lookTransform = t;
     }
@@ -24,7 +30,7 @@ public class Dancer : MonoBehaviour
     {
         if (_lookTransform != null)
         {
-            var lookDirection = (transform.position - _lookTransform.position).normalized;
+            var lookDirection = (transform.position - (Vector3)_lookTransform).normalized;
             _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
         }
     }

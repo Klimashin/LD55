@@ -1,13 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public static class Utils
 {
     public static Vector3 GetPointOnCircle(Vector3 center, float radius, float angle)
     {
-        var x = radius * Mathf.Cos(angle);
-        var y = radius * Mathf.Sin(angle);
+        var x = center.x + radius * Mathf.Cos(angle);
+        var y = center.y + radius * Mathf.Sin(angle);
         return new Vector3(x, y, center.z);
     }
 }
