@@ -63,7 +63,7 @@ public class Character : MonoBehaviour
         var translation = (mouseWorldPoint - currentPosition).normalized * translationDistance;
 
         var lookDirection = _lookTransform != null
-            ? (currentPosition - _lookTransform.position).normalized
+            ? (_lookTransform.position - currentPosition).normalized
             : translation.normalized;
         _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
         transform.Translate(translation);

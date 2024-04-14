@@ -30,7 +30,7 @@ public class Dancer : MonoBehaviour
     {
         if (_lookTransform != null)
         {
-            var lookDirection = (transform.position - (Vector3)_lookTransform).normalized;
+            var lookDirection = ((Vector3)_lookTransform - transform.position).normalized;
             _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
         }
     }
