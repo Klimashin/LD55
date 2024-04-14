@@ -151,12 +151,12 @@ public class RoundDance : MonoBehaviour
         while (segmentsQueue.Count > 0)
         {
             var segment = segmentsQueue.Dequeue();
-            _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, segment.Tracks);
+            _gameplaySoundSystem.SetLoopTracks(0, segment.GetTracks());
             await PlaySegment(segment);
 
             if (IsGameOver)
             {
-                _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[]{});
+                _gameplaySoundSystem.SetLoopTracks(0, new int[]{});
                 GameOverRoutine().Forget();
                 return;
             }
@@ -245,7 +245,7 @@ public class RoundDance : MonoBehaviour
     private async UniTask DragDancersAway(DanceSegment segment, int count)
     {
         _player.enabled = false;
-        _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[]{});
+        _gameplaySoundSystem.SetLoopTracks(0, new int[]{});
         var maxTargets = _dancers.Count(d => d.gameObject.activeSelf);
         Assert.IsTrue(count <= maxTargets);
         
@@ -274,7 +274,7 @@ public class RoundDance : MonoBehaviour
         await UniTask.Delay(TimeSpan.FromSeconds(_freeMovementAfterDrag), DelayType.DeltaTime, PlayerLoopTiming.Update,
             destroyCancellationToken);
         
-        _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, segment.Tracks);
+        _gameplaySoundSystem.SetLoopTracks(0, segment.GetTracks());
     }
 
     private void InstantiateDancers()
@@ -323,7 +323,38 @@ public class DanceSegment
 {
     public string Name;
     public float Duration;
-    public int ActiveLoop = 0;
-    public int[] Tracks = new int[] { 0 };
+    [Title("Active Tracks")]
+    [EnumToggleButtons] public TrackNumFlags Tracks;
     public List<DanceMovement> Movements;
+
+    public int[] GetTracks()
+    {
+        var flags = new List<int>();
+        if (Tracks.HasFlag(TrackNumFlags.Track1))
+            flags.Add(0);
+
+        if (Tracks.HasFlag(TrackNumFlags.Track2))
+            flags.Add(1);
+        
+        if (Tracks.HasFlag(TrackNumFlags.Track3))
+            flags.Add(2);
+        
+        if (Tracks.HasFlag(TrackNumFlags.Track4))
+            flags.Add(3);
+        
+        if (Tracks.HasFlag(TrackNumFlags.Track5))
+            flags.Add(4);
+        
+        return flags.ToArray();
+    }
+    
+    [System.Flags]
+    public enum TrackNumFlags
+    {
+        Track1 = 1 << 0,
+        Track2 = 1 << 1,
+        Track3 = 1 << 2,
+        Track4 = 1 << 3,
+        Track5 = 1 << 4,
+    }
 }
