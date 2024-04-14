@@ -23,6 +23,8 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private float _maxErrorRate = 1000f;
     [SerializeField] private float _positionError = 0.1f;
     [SerializeField] private int _maxDraggedDancers = 3;
+    [SerializeField] private float _noErrorCooldownAfterDrag = 5f;
+    [SerializeField] private float _freeMovementAfterDrag = 2f;
     [SerializeField] private AudioClip _ambientAudio;
 
     private SoundSystem _soundSystem;
@@ -39,6 +41,7 @@ public class RoundDance : MonoBehaviour
     private bool IsGameOver => DraggedDancers >= _maxDraggedDancers;
     public Vector3 Center => transform.position;
     public float ErrorRate { get; private set; } = 0f;
+    public float ErrorCooldown { get; private set; } = 0f;
     public float ErrorRateNormalized => ErrorRate / _maxErrorRate;
     public bool IsErrorRateOverCap => ErrorRate >= _maxErrorRate;
 
@@ -113,6 +116,14 @@ public class RoundDance : MonoBehaviour
 
     private void HandlePlayerErrors()
     {
+        _eyesController.OnErrorRateUpdated(ErrorRateNormalized);
+        
+        if (ErrorCooldown > 0f)
+        {
+            ErrorCooldown -= Time.deltaTime;
+            return;
+        }
+        
         if (IsPlayerInPlace())
         {
             ErrorRate -= _errorDownRate;
@@ -127,8 +138,6 @@ public class RoundDance : MonoBehaviour
             var error = _errorUpRate + distance * _errorUpDistanceCoefficient;
             ErrorRate += error;
         }
-        
-        _eyesController.OnErrorRateUpdated(ErrorRateNormalized);
     }
 
     private async UniTask DanceRoutine()
@@ -147,7 +156,7 @@ public class RoundDance : MonoBehaviour
 
             if (IsGameOver)
             {
-                _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[0]);
+                _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[]{});
                 GameOverRoutine().Forget();
                 return;
             }
@@ -236,12 +245,13 @@ public class RoundDance : MonoBehaviour
     private async UniTask DragDancersAway(DanceSegment segment, int count)
     {
         _player.enabled = false;
-        _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[0]);
+        _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[]{});
         var maxTargets = _dancers.Count(d => d.gameObject.activeSelf);
         Assert.IsTrue(count <= maxTargets);
         
         DraggedDancers += count;
         ErrorRate = 0;
+        ErrorCooldown = _noErrorCooldownAfterDrag;
         
         List<GameObject> targets = new List<GameObject>();
         while (targets.Count < count)
@@ -257,10 +267,11 @@ public class RoundDance : MonoBehaviour
         
         await _dragAnimator.AnimateDrag(Center, targets);
 
-        await UniTask.Delay(TimeSpan.FromSeconds(1f), DelayType.DeltaTime, PlayerLoopTiming.Update,
+        _player.enabled = true;
+        
+        await UniTask.Delay(TimeSpan.FromSeconds(_freeMovementAfterDrag), DelayType.DeltaTime, PlayerLoopTiming.Update,
             destroyCancellationToken);
         
-        _player.enabled = true;
         _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, segment.Tracks);
     }
 
@@ -284,8 +295,7 @@ public class RoundDance : MonoBehaviour
             dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle);
             if (i != _playerPosition)
             {
-                dancer.transform.position += new Vector3(UnityEngine.Random.Range(-_positionError, _positionError),
-                    UnityEngine.Random.Range(-_positionError, _positionError), 0f);
+                dancer.transform.position += new Vector3(Random.Range(-_positionError, _positionError), Random.Range(-_positionError, _positionError), 0f);
             }
 
             dancer.SetLookTransform(transform.position);

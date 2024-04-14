@@ -7,6 +7,7 @@ using UnityEngine.Assertions;
 public class GameplaySoundLoop : MonoBehaviour
 {
     [SerializeField] private AudioSource[] _tracks;
+    [SerializeField] private float _fadeTime = 2f;
 
     private const float UNMUTE_TIME = 0.5f;
 
@@ -14,12 +15,6 @@ public class GameplaySoundLoop : MonoBehaviour
 
     public void SetActiveTracks(params int[] tracks)
     {
-        if (tracks.Length == 0)
-        {
-            MuteAll();
-            return;
-        }
-        
         for (var i = 0; i < tracks.Length; i++)
         {
             Assert.IsTrue(_tracks.Length > tracks[i]);
@@ -33,11 +28,11 @@ public class GameplaySoundLoop : MonoBehaviour
         {
             if (tracks.Contains(i))
             {
-                UnMuteTrack(i, linkedTokenSource.Token).Forget();
+                UnMuteTrack(i, _fadeTime, linkedTokenSource.Token).Forget();
             }
             else
             {
-                _tracks[i].volume = 0f;
+                MuteTrack(i, _fadeTime, linkedTokenSource.Token).Forget();
             }
         }
     }
@@ -50,7 +45,7 @@ public class GameplaySoundLoop : MonoBehaviour
         }
     }
 
-    private async UniTaskVoid UnMuteTrack(int index, CancellationToken token)
+    private async UniTaskVoid UnMuteTrack(int index, float fadeTime, CancellationToken token)
     {
         var track = _tracks[index];
         if (track.volume.Equals(1f))
@@ -61,12 +56,31 @@ public class GameplaySoundLoop : MonoBehaviour
         float time = 0f;
         while (time < UNMUTE_TIME)
         {
-            _tracks[index].volume = Mathf.Lerp(0f, 1f, time / UNMUTE_TIME);
+            _tracks[index].volume = Mathf.Lerp(0f, 1f, time / fadeTime);
             await UniTask.DelayFrame(1, PlayerLoopTiming.Update, token);
             time += Time.deltaTime;
         }
 
         _tracks[index].volume = 1f;
+    }
+    
+    private async UniTaskVoid MuteTrack(int index, float fadeTime, CancellationToken token)
+    {
+        var track = _tracks[index];
+        if (track.volume.Equals(0f))
+        {
+            return;
+        }
+        
+        float time = 0f;
+        while (time < fadeTime)
+        {
+            _tracks[index].volume = Mathf.Lerp(1f, 0f, time / fadeTime);
+            await UniTask.DelayFrame(1, PlayerLoopTiming.Update, token);
+            time += Time.deltaTime;
+        }
+
+        _tracks[index].volume = 0f;
     }
 
     private void OnEnable()
