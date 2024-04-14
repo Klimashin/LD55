@@ -9,6 +9,8 @@ public class GameplayInstaller : MonoBehaviour, IInstaller
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private LightsController _lightsController;
     [SerializeField] private EyesController _eyesController;
+    [SerializeField] private DragAnimator _dragAnimator;
+    [SerializeField] private GameplaySoundSystem _gameplaySoundSystem;
 
     public void InstallBindings(ContainerBuilder containerBuilder)
     {
@@ -18,5 +20,7 @@ public class GameplayInstaller : MonoBehaviour, IInstaller
         containerBuilder.AddSingleton(_danceController);
         containerBuilder.AddSingleton(_cameraController);
         containerBuilder.AddSingleton(_eyesController);
+        containerBuilder.AddSingleton(_dragAnimator);
+        containerBuilder.AddSingleton(_gameplaySoundSystem);
     }
 }

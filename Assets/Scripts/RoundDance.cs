@@ -1,9 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Threading.Tasks;
 using Reflex.Attributes;
+using Sirenix.OdinInspector;
 using UnityEngine;
+using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public class RoundDance : MonoBehaviour
 {
@@ -18,12 +22,14 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private float _errorDownRate = 1f;
     [SerializeField] private float _maxErrorRate = 1000f;
     [SerializeField] private float _positionError = 0.1f;
-    [SerializeField] private AudioClip _audio1;
+    [SerializeField] private AudioClip _ambientAudio;
 
     private SoundSystem _soundSystem;
     private CameraController _cameraController;
     private LightsController _lightsController;
     private EyesController _eyesController;
+    private DragAnimator _dragAnimator;
+    private GameplaySoundSystem _gameplaySoundSystem;
     private Character _player;
     private Dancer[] _dancers;
     private Vector3 PlayerExpectedPosition => _dancers[_playerPosition].transform.position;
@@ -35,12 +41,21 @@ public class RoundDance : MonoBehaviour
     public bool IsGameOver => ErrorRate >= _maxErrorRate;
 
     [Inject]
-    private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player, LightsController lightsController, EyesController eyesController)
+    private void Inject(
+        SoundSystem soundSystem,
+        CameraController cameraController,
+        Character player,
+        LightsController lightsController,
+        EyesController eyesController,
+        GameplaySoundSystem gameplaySoundSystem,
+        DragAnimator dragAnimator)
     {
         _soundSystem = soundSystem;
+        _gameplaySoundSystem = gameplaySoundSystem;
         _cameraController = cameraController;
         _lightsController = lightsController;
         _eyesController = eyesController;
+        _dragAnimator = dragAnimator;
         _player = player;
     }
 
@@ -55,6 +70,27 @@ public class RoundDance : MonoBehaviour
     private void Start()
     {
         InstantiateDancers();
+        _soundSystem.PlayMusicClip(_ambientAudio);
+    }
+
+    [Button]
+    private void TestDrag(int count = 1)
+    {
+        var maxTargets = _dancers.Count(d => d.gameObject.activeSelf);
+        Assert.IsTrue(count <= maxTargets);
+        List<GameObject> targets = new List<GameObject>();
+        while (targets.Count < count)
+        {
+            var dancer = _dancers[Random.Range(0, _dancers.Length)];
+            if (!dancer.gameObject.activeSelf || targets.Contains(dancer.gameObject))
+            {
+                continue;
+            }
+            
+            targets.Add(dancer.gameObject);
+        }
+        
+        _dragAnimator.AnimateDrag(Center, targets).Forget();
     }
 
     private void Update()
@@ -103,7 +139,7 @@ public class RoundDance : MonoBehaviour
     private async UniTask DanceRoutine()
     {
         _cameraController.SetCamera(CameraController.CameraType.Dance);
-        _soundSystem.PlayMusicClip(_audio1);
+        _soundSystem.FadeCurrentMusic(0.5f);
         _player.SetLookTransform(transform);
         State = DanceState.Started;
 
@@ -111,6 +147,7 @@ public class RoundDance : MonoBehaviour
         while (segmentsQueue.Count > 0)
         {
             var segment = segmentsQueue.Dequeue();
+            _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, segment.Tracks);
             await PlaySegment(segment);
 
             if (IsGameOver)
@@ -236,5 +273,7 @@ public class RoundDance : MonoBehaviour
 public class DanceSegment
 {
     public float Duration;
+    public int ActiveLoop = 0;
+    public int[] Tracks = new int[] { 0 };
     public List<DanceMovement> Movements;
 }

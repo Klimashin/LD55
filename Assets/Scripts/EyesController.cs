@@ -69,7 +69,6 @@ public class EyesController : MonoBehaviour
     private GameObject CreateEye()
     {
         var prefab = _eyePrefabs[Random.Range(0, _eyePrefabs.Length)];
-        prefab.transform.position = GetSpawnPoint();
         return Instantiate(prefab, transform);
     }
 
