@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: test_ConcentricMovement_R4 1
   m_EditorClassIdentifier: 
   TargetRadius: 4
+  OnlyOdd: 1
+  OnlyEven: 1
