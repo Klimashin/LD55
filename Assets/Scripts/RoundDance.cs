@@ -23,6 +23,7 @@ public class RoundDance : MonoBehaviour
     private SoundSystem _soundSystem;
     private CameraController _cameraController;
     private LightsController _lightsController;
+    private EyesController _eyesController;
     private Character _player;
     private Dancer[] _dancers;
     private Vector3 PlayerExpectedPosition => _dancers[_playerPosition].transform.position;
@@ -34,11 +35,12 @@ public class RoundDance : MonoBehaviour
     public bool IsGameOver => ErrorRate >= _maxErrorRate;
 
     [Inject]
-    private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player, LightsController lightsController)
+    private void Inject(SoundSystem soundSystem, CameraController cameraController, Character player, LightsController lightsController, EyesController eyesController)
     {
         _soundSystem = soundSystem;
         _cameraController = cameraController;
         _lightsController = lightsController;
+        _eyesController = eyesController;
         _player = player;
     }
 
@@ -94,6 +96,8 @@ public class RoundDance : MonoBehaviour
             var error = _errorUpRate + distance * _errorUpDistanceCoefficient;
             ErrorRate += error;
         }
+        
+        _eyesController.OnErrorRateUpdated(ErrorRateNormalized);
     }
 
     private async UniTask DanceRoutine()

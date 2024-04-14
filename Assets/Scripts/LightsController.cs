@@ -33,6 +33,15 @@ public class LightsController : MonoBehaviour
     {
         float currentTime = 0f;
         float[] initialIntensity = _allLights.Select(l => l.intensity).ToArray();
+        foreach (var light2D in _allLights)
+        {
+            var animator = light2D.GetComponentInParent<Animator>();
+            if (animator != null)
+            {
+                animator.enabled = false;
+            }
+        }
+
         while (currentTime <= time)
         {
             for (int i = 0; i < _allLights.Count; i++)

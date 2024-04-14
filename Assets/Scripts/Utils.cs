@@ -8,6 +8,14 @@ public static class Utils
         var y = center.y + radius * Mathf.Sin(angle);
         return new Vector3(x, y, center.z);
     }
+    
+    public static Vector3 RandomPointInBounds(Bounds bounds) {
+        return new Vector3(
+            Random.Range(bounds.min.x, bounds.max.x),
+            Random.Range(bounds.min.y, bounds.max.y),
+            Random.Range(bounds.min.z, bounds.max.z)
+        );
+    }
 }
 
 public static class RectTransformExtensions

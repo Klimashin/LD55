@@ -8,6 +8,7 @@ public class GameplayInstaller : MonoBehaviour, IInstaller
     [SerializeField] private CameraController _cameraController;
     [SerializeField] private Camera _mainCamera;
     [SerializeField] private LightsController _lightsController;
+    [SerializeField] private EyesController _eyesController;
 
     public void InstallBindings(ContainerBuilder containerBuilder)
     {
@@ -16,5 +17,6 @@ public class GameplayInstaller : MonoBehaviour, IInstaller
         containerBuilder.AddSingleton(_character);
         containerBuilder.AddSingleton(_danceController);
         containerBuilder.AddSingleton(_cameraController);
+        containerBuilder.AddSingleton(_eyesController);
     }
 }
