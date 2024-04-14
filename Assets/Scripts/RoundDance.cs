@@ -22,6 +22,7 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private float _errorDownRate = 1f;
     [SerializeField] private float _maxErrorRate = 1000f;
     [SerializeField] private float _positionError = 0.1f;
+    [SerializeField] private int _maxDraggedDancers = 3;
     [SerializeField] private AudioClip _ambientAudio;
 
     private SoundSystem _soundSystem;
@@ -34,11 +35,12 @@ public class RoundDance : MonoBehaviour
     private Dancer[] _dancers;
     private Vector3 PlayerExpectedPosition => _dancers[_playerPosition].transform.position;
     private DanceState State { get; set; } = DanceState.WaitingForPlayer;
-
+    private int DraggedDancers { get; set; } = 0;
+    private bool IsGameOver => DraggedDancers >= _maxDraggedDancers;
     public Vector3 Center => transform.position;
     public float ErrorRate { get; private set; } = 0f;
     public float ErrorRateNormalized => ErrorRate / _maxErrorRate;
-    public bool IsGameOver => ErrorRate >= _maxErrorRate;
+    public bool IsErrorRateOverCap => ErrorRate >= _maxErrorRate;
 
     [Inject]
     private void Inject(
@@ -70,7 +72,7 @@ public class RoundDance : MonoBehaviour
     private void Start()
     {
         InstantiateDancers();
-        _soundSystem.PlayMusicClip(_ambientAudio);
+        _soundSystem.PlayMusicClip(_ambientAudio, 3f);
     }
 
     [Button]
@@ -101,13 +103,6 @@ public class RoundDance : MonoBehaviour
             {
                 DanceRoutine().Forget();
             }
-
-            return;
-        }
-
-        if (State == DanceState.Started)
-        {
-            HandlePlayerErrors();
         }
     }
 
@@ -139,7 +134,7 @@ public class RoundDance : MonoBehaviour
     private async UniTask DanceRoutine()
     {
         _cameraController.SetCamera(CameraController.CameraType.Dance);
-        _soundSystem.FadeCurrentMusic(0.5f);
+        _soundSystem.FadeCurrentMusic(3f);
         _player.SetLookTransform(transform);
         State = DanceState.Started;
 
@@ -152,6 +147,7 @@ public class RoundDance : MonoBehaviour
 
             if (IsGameOver)
             {
+                _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[0]);
                 GameOverRoutine().Forget();
                 return;
             }
@@ -163,10 +159,13 @@ public class RoundDance : MonoBehaviour
     private async UniTaskVoid GameOverRoutine()
     {
         State = DanceState.GameOver;
-        _player.SetLookTransform(null);
-        _soundSystem.FadeCurrentMusic(1f);
-        await _lightsController.LightsOff(1f);
-        await UniTask.Delay(TimeSpan.FromSeconds(2f));
+        _player.enabled = false;
+        List<GameObject> dragTarget = _dancers.Where(d => d.gameObject.activeSelf).Select(d => d.gameObject).ToList();
+        dragTarget.Add(_player.gameObject);
+
+        _dragAnimator.AnimateDrag(Center, dragTarget).Forget();
+        
+        await _lightsController.LightsOff(5f);
 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
@@ -182,7 +181,7 @@ public class RoundDance : MonoBehaviour
     private async UniTask PlaySegment(DanceSegment segment)
     {
         float duration = 0f;
-        List<List<IDanceMovementHandler>> handlers = new();
+        Dictionary<Dancer, List<IDanceMovementHandler>> handlers = new();
         for (var i = 0; i < _dancers.Length; i++)
         {
             var dancerHandlers = new List<IDanceMovementHandler>();
@@ -193,23 +192,30 @@ public class RoundDance : MonoBehaviour
                 handler.OnStartSegment();
             }
             
-            handlers.Add(dancerHandlers);
+            handlers.Add(_dancers[i], dancerHandlers);
         }
 
         while (duration < segment.Duration)
         {
-            if (IsGameOver)
+            if (IsErrorRateOverCap)
             {
-                return;
+                if (IsGameOver)
+                {
+                    return;
+                }
+                
+                await DragDancersAway(segment, 1);
             }
-            
+
+            HandlePlayerErrors();
+
             var normalizedTime = duration / segment.Duration;
             var deltaTime = Time.deltaTime;
-            foreach (var dancerHandlers in handlers)
+            foreach (var (dancer , dancerHandlers) in handlers)
             {
                 foreach (var handler in dancerHandlers)
                 {
-                    handler.HandleDancerPosition(deltaTime, normalizedTime);
+                    dancer.transform.position = handler.HandleDancerPosition(deltaTime, normalizedTime);
                 }
             }
 
@@ -218,13 +224,44 @@ public class RoundDance : MonoBehaviour
             await UniTask.DelayFrame(1, PlayerLoopTiming.Update, destroyCancellationToken);
         }
         
-        foreach (var dancerHandlers in handlers)
+        foreach (var dancerHandlers in handlers.Values)
         {
             foreach (var handler in dancerHandlers)
             {
                 handler.OnEndSegment();
             }
         }
+    }
+
+    private async UniTask DragDancersAway(DanceSegment segment, int count)
+    {
+        _player.enabled = false;
+        _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, new int[0]);
+        var maxTargets = _dancers.Count(d => d.gameObject.activeSelf);
+        Assert.IsTrue(count <= maxTargets);
+        
+        DraggedDancers += count;
+        ErrorRate = 0;
+        
+        List<GameObject> targets = new List<GameObject>();
+        while (targets.Count < count)
+        {
+            var dancer = _dancers[Random.Range(0, _dancers.Length)];
+            if (!dancer.gameObject.activeSelf || targets.Contains(dancer.gameObject))
+            {
+                continue;
+            }
+            
+            targets.Add(dancer.gameObject);
+        }
+        
+        await _dragAnimator.AnimateDrag(Center, targets);
+
+        await UniTask.Delay(TimeSpan.FromSeconds(1f), DelayType.DeltaTime, PlayerLoopTiming.Update,
+            destroyCancellationToken);
+        
+        _player.enabled = true;
+        _gameplaySoundSystem.SetLoopTracks(segment.ActiveLoop, segment.Tracks);
     }
 
     private void InstantiateDancers()

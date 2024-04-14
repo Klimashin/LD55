@@ -37,9 +37,9 @@ public class InPlaceCircleMovementHandler : DanceMovementHandler<InPlaceCircleMo
         dancer.SetLookTransform(dance.transform.position);
     }
 
-    public override void HandleDancerPosition(float deltaTime, float normalizedTime)
+    public override Vector3 HandleDancerPosition(float deltaTime, float normalizedTime)
     {
         var angle = _initialAngle + normalizedTime * 2 * Mathf.PI;
-        dancer.transform.position = Utils.GetPointOnCircle(_circleCenter, movement.Radius, angle);
+        return Utils.GetPointOnCircle(_circleCenter, movement.Radius, angle);
     }
 }

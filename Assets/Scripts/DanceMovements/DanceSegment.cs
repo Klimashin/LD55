@@ -21,7 +21,7 @@ public abstract class DanceMovementHandler<T> : IDanceMovementHandler where T : 
         radiusOnStart = (dancer.transform.position - dance.Center).magnitude;
     }
     
-    public abstract void HandleDancerPosition(float deltaTime, float normalizedTime);
+    public abstract Vector3 HandleDancerPosition(float deltaTime, float normalizedTime);
     
     public virtual void OnStartSegment() {}
     
@@ -30,7 +30,7 @@ public abstract class DanceMovementHandler<T> : IDanceMovementHandler where T : 
 
 public interface IDanceMovementHandler
 {
-    public void HandleDancerPosition(float deltaTime, float normalizedTime);
+    public Vector3 HandleDancerPosition(float deltaTime, float normalizedTime);
     
     public void OnStartSegment() {}
     

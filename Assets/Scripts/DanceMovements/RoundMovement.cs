@@ -31,7 +31,7 @@ public class RoundMovementHandler : DanceMovementHandler<RoundMovement>
         dancer.SetDressAnimate(false);
     }
     
-    public override void HandleDancerPosition(float deltaTime, float normalizedTime)
+    public override Vector3 HandleDancerPosition(float deltaTime, float normalizedTime)
     {
         var currentPosition = dancer.transform.position;
         var radius = (currentPosition - dance.Center).magnitude;
@@ -44,6 +44,6 @@ public class RoundMovementHandler : DanceMovementHandler<RoundMovement>
         }
 
         var angle = currentAngle + deltaAngle;
-        dancer.transform.position = Utils.GetPointOnCircle(dance.Center, radius, angle);
+        return Utils.GetPointOnCircle(dance.Center, radius, angle);
     }
 }

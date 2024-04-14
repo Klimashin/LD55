@@ -40,7 +40,7 @@ public class ZigZagMovementHandler : DanceMovementHandler<ZigZagMovement>
         dancer.SetDressAnimate(false);
     }
 
-    public override void HandleDancerPosition(float deltaTime, float normalizedTime)
+    public override Vector3 HandleDancerPosition(float deltaTime, float normalizedTime)
     {
         var currentStepData = GetStepByNormalizedTime(normalizedTime);
         if (movement.Type == ZigZagMovement.ZigZagType.Concentric)
@@ -67,7 +67,7 @@ public class ZigZagMovementHandler : DanceMovementHandler<ZigZagMovement>
 
             var currentPosition = dancer.transform.position;
             var currentAngle = Mathf.Atan2(currentPosition.y, currentPosition.x);
-            dancer.transform.position = Utils.GetPointOnCircle(dance.Center, radius, currentAngle);
+            return Utils.GetPointOnCircle(dance.Center, radius, currentAngle);
         }
         else
         {
@@ -76,7 +76,7 @@ public class ZigZagMovementHandler : DanceMovementHandler<ZigZagMovement>
             var currentAngle = Mathf.Atan2(currentPosition.y, currentPosition.x);
             var deltaAngle = Mathf.Deg2Rad * movement.AngularVelocity * deltaTime * (currentStepData.step % 2 == 0 ? 1 : -1);
             var angle = currentAngle + deltaAngle;
-            dancer.transform.position = Utils.GetPointOnCircle(dance.Center, radius, angle);
+            return Utils.GetPointOnCircle(dance.Center, radius, angle);
         }
     }
 

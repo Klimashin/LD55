@@ -37,17 +37,17 @@ public class ConcentricMovementHandler : DanceMovementHandler<ConcentricMovement
         dancer.SetDressAnimate(false);
     }
 
-    public override void HandleDancerPosition(float deltaTime, float normalizedTime)
+    public override Vector3 HandleDancerPosition(float deltaTime, float normalizedTime)
     {
         if (movement.OnlyOdd && dancer.Index % 2 == 0
             || movement.OnlyEven && dancer.Index % 2 == 1)
         {
-            return;
+            return dancer.transform.position;
         }
         
         var radius = Mathf.Lerp(radiusOnStart, movement.TargetRadius, normalizedTime);
         var currentPosition = dancer.transform.position;
         var currentAngle = Mathf.Atan2(currentPosition.y, currentPosition.x);
-        dancer.transform.position = Utils.GetPointOnCircle(dance.Center, radius, currentAngle);
+        return Utils.GetPointOnCircle(dance.Center, radius, currentAngle);
     }
 }
