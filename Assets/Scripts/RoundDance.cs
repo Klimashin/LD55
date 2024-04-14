@@ -17,6 +17,7 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private float _errorUpRate = 2f;
     [SerializeField] private float _errorDownRate = 1f;
     [SerializeField] private float _maxErrorRate = 1000f;
+    [SerializeField] private float _positionError = 0.1f;
     [SerializeField] private AudioClip _audio1;
 
     private SoundSystem _soundSystem;
@@ -200,7 +201,9 @@ public class RoundDance : MonoBehaviour
         for (int i = 0; i < _dancersCount; i++)
         {
             var dancer = Instantiate(_dancerPrefab);
-            dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle);
+            dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle)
+                                        + new Vector3(UnityEngine.Random.Range(-_positionError, _positionError),
+                                            UnityEngine.Random.Range(-_positionError, _positionError), 0f);
             dancer.SetLookTransform(transform);
             _dancers[i] = dancer;
             angle += deltaAngle;

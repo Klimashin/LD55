@@ -9,9 +9,11 @@ public class Character : MonoBehaviour
     [SerializeField] private float _deadZone;
     [SerializeField] private float _speedCutDistance;
     [SerializeField] private Transform _rendererTransform;
+    [SerializeField] private Animator _animator;
     
     private Camera _camera;
     private float _currentSpeed;
+    private static readonly int DressAnimateHash = Animator.StringToHash("AnimateDress");
     [CanBeNull] private Transform _lookTransform;
 
     [Inject]
@@ -27,6 +29,7 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
+        _animator.SetBool(DressAnimateHash, false);
         bool isMoving = !Input.GetMouseButton(0);
         if (!isMoving)
         {
@@ -56,13 +59,14 @@ public class Character : MonoBehaviour
         }
 
         var currentPosition = transform.position;
-        var translation = (mouseWorldPoint - currentPosition).normalized * (_currentSpeed * Time.deltaTime);
-        var targetPosition = currentPosition + translation;
-        
+        var translationDistance = _currentSpeed * Time.deltaTime;
+        var translation = (mouseWorldPoint - currentPosition).normalized * translationDistance;
+
         var lookDirection = _lookTransform != null
             ? (currentPosition - _lookTransform.position).normalized
             : translation.normalized;
         _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
         transform.Translate(translation);
+        _animator.SetBool(DressAnimateHash, translationDistance >= float.Epsilon);
     }
 }

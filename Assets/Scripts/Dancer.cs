@@ -4,12 +4,20 @@ using UnityEngine;
 public class Dancer : MonoBehaviour
 {
     [SerializeField] private Transform _rendererTransform;
-    
+    [SerializeField] private Animator _animator;
     [CanBeNull] private Transform _lookTransform;
+
+    private Vector3 _prevFramePos;
+    private static readonly int DressAnimateHash = Animator.StringToHash("AnimateDress");
     
     public void SetLookTransform([CanBeNull] Transform t)
     {
         _lookTransform = t;
+    }
+
+    public void SetDressAnimate(bool isOn)
+    {
+        _animator.SetBool(DressAnimateHash, isOn);
     }
 
     private void Update()

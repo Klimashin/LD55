@@ -19,6 +19,18 @@ public class RoundMovementHandler : DanceMovementHandler<RoundMovement>
     {
     }
     
+    public override void OnStartSegment()
+    {
+        base.OnStartSegment();
+        dancer.SetDressAnimate(true);
+    }
+
+    public override void OnEndSegment()
+    {
+        base.OnEndSegment();
+        dancer.SetDressAnimate(false);
+    }
+    
     public override void HandleDancerPosition(float deltaTime, float normalizedTime)
     {
         var currentPosition = dancer.transform.position;

@@ -1,7 +1,6 @@
 using System;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 [CreateAssetMenu(menuName = "Dance Movements/ZigZagMovement")]
 public class ZigZagMovement : DanceMovement
@@ -27,6 +26,18 @@ public class ZigZagMovementHandler : DanceMovementHandler<ZigZagMovement>
 {
     public ZigZagMovementHandler(DanceMovement movement, RoundDance dance, Dancer dancer) : base(movement, dance, dancer)
     {
+    }
+    
+    public override void OnStartSegment()
+    {
+        base.OnStartSegment();
+        dancer.SetDressAnimate(true);
+    }
+
+    public override void OnEndSegment()
+    {
+        base.OnEndSegment();
+        dancer.SetDressAnimate(false);
     }
 
     public override void HandleDancerPosition(float deltaTime, float normalizedTime)
