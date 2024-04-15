@@ -76,5 +76,7 @@ public class DragHand : MonoBehaviour
     private void Update()
     {
         _armLineRenderer.SetPosition(1, _hand.position);
+        var lookDirection = Quaternion.AngleAxis(90, Vector3.forward) * (_armLineRenderer.GetPosition(0) - _hand.transform.position).normalized;
+        _hand.transform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
     }
 }
