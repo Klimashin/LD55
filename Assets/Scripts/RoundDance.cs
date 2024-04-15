@@ -78,7 +78,10 @@ public class RoundDance : MonoBehaviour
     private void Start()
     {
         InstantiateDancers();
-        _soundSystem.PlayMusicClip(_ambientAudio, 3f);
+        if (!_soundSystem.IsPlayingClip(_ambientAudio))
+        {
+            _soundSystem.PlayMusicClip(_ambientAudio, 3f);
+        }
     }
 
     [Button]

@@ -22,10 +22,12 @@ public class InGameUI : MonoBehaviour
     private void OpenMenu()
     {
         _pauseMenu.gameObject.SetActive(true);
+        Time.timeScale = 0f;
     }
     
     private void CloseMenu()
     {
         _pauseMenu.gameObject.SetActive(false);
+        Time.timeScale = 1f;
     }
 }

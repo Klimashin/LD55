@@ -6,6 +6,9 @@ public class StartScene : MonoBehaviour
 {
     [SerializeField] private List<TextController> _textControllers;
     [SerializeField] private Character _player;
+    [SerializeField] private Transform _initialLookTransform;
+
+    private bool _isReleased;
 
     private void Start()
     {
@@ -16,20 +19,33 @@ public class StartScene : MonoBehaviour
     {
         if (Input.GetMouseButton(0))
         {
-            _player.enabled = true;
+            ReleasePlayer();
         }
     }
 
     private async UniTaskVoid StartSceneRoutine()
     {
         _player.enabled = false;
+        _player.SetLookTransform(_initialLookTransform);
         
         for (var i = 0; i < _textControllers.Count; i++)
         {
             await _textControllers[i].PlayAll();
         }
-        
-        _player.enabled = true;
+
+        ReleasePlayer();
         enabled = false;
+    }
+
+    private void ReleasePlayer()
+    {
+        if (_isReleased)
+        {
+            return;
+        }
+
+        _player.enabled = true;
+        _player.SetLookTransform(null);
+        _isReleased = true;
     }
 }
