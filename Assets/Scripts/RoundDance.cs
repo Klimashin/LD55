@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Reflex.Attributes;
@@ -126,7 +127,7 @@ public class RoundDance : MonoBehaviour
         
         if (IsPlayerInPlace())
         {
-            ErrorRate -= _errorDownRate;
+            ErrorRate -= _errorDownRate * Time.deltaTime;
             if (ErrorRate < 0f)
             {
                 ErrorRate = 0f;
@@ -135,8 +136,9 @@ public class RoundDance : MonoBehaviour
         else
         {
             var distance = Vector3.Distance(_player.transform.position, PlayerExpectedPosition);
-            var error = _errorUpRate + distance * _errorUpDistanceCoefficient;
+            var error = (_errorUpRate + distance * _errorUpDistanceCoefficient) * Time.deltaTime;
             ErrorRate += error;
+            Debug.Log($"ErrorRate: {ErrorRate.ToString(CultureInfo.InvariantCulture)}");
         }
     }
 
@@ -167,7 +169,7 @@ public class RoundDance : MonoBehaviour
 
             if (IsGameOver)
             {
-                _gameplaySoundSystem.SetLoopTracks(0, new int[]{});
+                _gameplaySoundSystem.SetLoopTracks(0, new int[]{5});
                 GameOverRoutine().Forget();
                 return;
             }
@@ -193,6 +195,8 @@ public class RoundDance : MonoBehaviour
     private async UniTaskVoid GameCompletedRoutine()
     {
         State = DanceState.Finished;
+        ErrorRate = 0f;
+        _eyesController.OnErrorRateUpdated(ErrorRate);
         _player.SetLookTransform(null);
         await _lightsController.SetGlobalIntensity(3f, 2f);
         _lightsController.DisableShadows();
@@ -258,12 +262,11 @@ public class RoundDance : MonoBehaviour
     private async UniTask DragDancersAway(DanceSegment segment, int count)
     {
         _player.enabled = false;
-        _gameplaySoundSystem.SetLoopTracks(0, new int[]{});
+        _gameplaySoundSystem.SetLoopTracks(0, new int[]{5});
         var maxTargets = _dancers.Count(d => d.gameObject.activeSelf);
         Assert.IsTrue(count <= maxTargets);
         
         DraggedDancers += count;
-        ErrorRate = 0;
         ErrorCooldown = _noErrorCooldownAfterDrag;
         
         List<GameObject> targets = new List<GameObject>();
@@ -280,7 +283,8 @@ public class RoundDance : MonoBehaviour
         
         await _dragAnimator.AnimateDrag(Center, targets);
         
-        _eyesController.OnErrorRateUpdated(0f);
+        ErrorRate = 0f;
+        _eyesController.OnErrorRateUpdated(ErrorRate);
 
         _player.enabled = true;
         
