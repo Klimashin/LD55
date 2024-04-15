@@ -371,10 +371,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _maxSpeed: 4
   _acceleration: 4
-  _deadZone: 0.3
-  _speedCutDistance: 2
+  _deadZone: 0.5
+  _speedCutDistance: 1
   _rendererTransform: {fileID: 2384733057537759454}
   _animator: {fileID: 6051140346406926818}
+  _useArrowControls: 0
 --- !u!114 &6936519147329327484
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -10,6 +10,7 @@ public class Character : MonoBehaviour
     [SerializeField] private float _speedCutDistance;
     [SerializeField] private Transform _rendererTransform;
     [SerializeField] private Animator _animator;
+    [SerializeField] private bool _useArrowControls;
     
     private Camera _camera;
     private float _currentSpeed;
@@ -29,6 +30,17 @@ public class Character : MonoBehaviour
 
     private void Update()
     {
+        if (_useArrowControls)
+        {
+            ArrowsControl();
+            return;
+        }
+
+        MouseControl();
+    }
+
+    private void MouseControl()
+    {
         _animator.SetBool(DressAnimateHash, false);
         bool isMoving = !Input.GetMouseButton(0);
         if (!isMoving)
@@ -43,6 +55,7 @@ public class Character : MonoBehaviour
         var distance = Vector3.Distance(mouseWorldPoint, transform.position);
         if (distance <= _deadZone)
         {
+            _currentSpeed = 0f;
             return;
         }
 
@@ -68,5 +81,49 @@ public class Character : MonoBehaviour
         _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
         transform.Translate(translation);
         _animator.SetBool(DressAnimateHash, translationDistance >= float.Epsilon);
+    }
+
+    private void ArrowsControl()
+    {
+        bool moveLeft = Input.GetKey(KeyCode.LeftArrow);
+        bool moveRight = Input.GetKey(KeyCode.RightArrow);
+        bool moveUp = Input.GetKey(KeyCode.UpArrow);
+        bool moveDown = Input.GetKey(KeyCode.DownArrow);
+
+        if (!moveLeft && !moveRight && !moveDown && !moveUp)
+        {
+            _currentSpeed = 0;
+            _animator.SetBool(DressAnimateHash, false);
+            return;
+        }
+        
+        _animator.SetBool(DressAnimateHash, true);
+
+        var direction = Vector3.zero;
+        if (moveLeft)
+            direction += Vector3.left;
+        if (moveRight)
+            direction += Vector3.right;
+        if (moveDown)
+            direction += Vector3.down;
+        if (moveUp)
+            direction += Vector3.up;
+
+        direction = direction.normalized;
+        _currentSpeed += _acceleration * Time.deltaTime;
+        if (_currentSpeed > _maxSpeed)
+        {
+            _currentSpeed = _maxSpeed;
+        }
+        
+        var currentPosition = transform.position;
+        var translationDistance = _currentSpeed * Time.deltaTime;
+        var translation = direction * translationDistance;
+
+        var lookDirection = _lookTransform != null
+            ? (_lookTransform.position - currentPosition).normalized
+            : translation.normalized;
+        _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
+        transform.Translate(translation);
     }
 }
