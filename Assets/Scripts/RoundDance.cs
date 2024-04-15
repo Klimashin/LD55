@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using Reflex.Attributes;
@@ -12,7 +11,7 @@ using Random = UnityEngine.Random;
 
 public class RoundDance : MonoBehaviour
 {
-    [SerializeField] private Dancer _dancerPrefab;
+    [SerializeField] private List<Dancer> _dancerPrefabs;
     [SerializeField] private int _dancersCount;
     [SerializeField] private int _playerPosition;
     [SerializeField] private List<DanceSegment> _danceSegments;
@@ -315,7 +314,8 @@ public class RoundDance : MonoBehaviour
         float deltaAngle = 2 * Mathf.PI / _dancersCount;
         for (int i = 0; i < _dancersCount; i++)
         {
-            var dancer = Instantiate(_dancerPrefab);
+            var prefab = _dancerPrefabs[Random.Range(0, _dancerPrefabs.Count)];
+            var dancer = Instantiate(prefab);
             dancer.SetIndex(i);
             dancer.transform.position = Utils.GetPointOnCircle(Center, _initialRadius, angle);
             if (i != _playerPosition)

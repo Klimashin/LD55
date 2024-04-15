@@ -195,7 +195,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: -1, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3248254735513554564}
@@ -241,7 +241,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 2
-  m_Sprite: {fileID: 21300000, guid: e479a41259896444aacbc310847d2fd6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 7515b4f43c02251418fc04c88702a354, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -498,7 +498,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: c010446041867be4ab4dbc1e5cc208c9, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 3edc4ec10f2e233449b78210b446084e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -729,7 +729,7 @@ MonoBehaviour:
   - {x: -0.35850063, y: -0.17075539, z: 0}
   m_ShapePathHash: 885754496
   m_Mesh: {fileID: 0}
-  m_InstanceId: 90524
+  m_InstanceId: 90850
   m_LocalBounds:
     m_Center: {x: -0.0048132837, y: -0.000330925, z: 0}
     m_Extent: {x: 0.39337498, y: 0.39687634, z: 0}
@@ -822,7 +822,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Sprite: {fileID: 21300000, guid: 38b5b200fbd5b754baf7ec391ee4c25c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: a9c7adbb99f95f64b9f74f45b15698ec, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 1
