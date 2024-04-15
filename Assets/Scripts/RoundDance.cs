@@ -211,8 +211,13 @@ public class RoundDance : MonoBehaviour
         ErrorRate = 0f;
         _eyesController.OnErrorRateUpdated(ErrorRate);
         _player.SetLookTransform(null);
-        await _lightsController.SetGlobalIntensity(3f, _sunDawnTime);
+        await _lightsController.SetGlobalIntensity(6f, _sunDawnTime);
         _lightsController.DisableShadows();
+        
+        await UniTask.Delay(TimeSpan.FromSeconds(1f), DelayType.DeltaTime, PlayerLoopTiming.Update,
+            destroyCancellationToken);
+
+        SceneManager.LoadScene(2);
     }
 
     private async UniTask PlaySegment(DanceSegment segment)

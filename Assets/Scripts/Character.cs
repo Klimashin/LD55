@@ -27,6 +27,12 @@ public class Character : MonoBehaviour
     public void SetLookTransform([CanBeNull] Transform t)
     {
         _lookTransform = t;
+
+        if (_lookTransform != null)
+        {
+            var lookDirection = (_lookTransform.position - transform.position).normalized;
+            _rendererTransform.rotation = Quaternion.LookRotation(Vector3.forward, lookDirection);
+        }
     }
     
     public void SetHandsPos(Dancer.HandsPos handsPos)
