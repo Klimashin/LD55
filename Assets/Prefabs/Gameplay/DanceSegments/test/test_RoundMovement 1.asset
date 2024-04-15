@@ -10,30 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1d9d04ad914da7343b36005df809eae7, type: 3}
-  m_Name: test_RoundMovement_0 2_vs
+  m_Name: test_RoundMovement 1
   m_EditorClassIdentifier: 
-  IsClockwise: 0
+  IsClockwise: 1
   AngularVelocity: 35
   VelocityCurve:
     serializedVersion: 2
     m_Curve:
     - serializedVersion: 3
-      time: -0.0027820969
-      value: 0.49962598
-      inSlope: 2.9023063
-      outSlope: 2.9023063
+      time: 0.00041461946
+      value: 0.49483472
+      inSlope: 2.140344
+      outSlope: 2.140344
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.022113012
+      outWeight: 0.043232184
     - serializedVersion: 3
-      time: 0.99635774
-      value: 0.5995288
-      inSlope: -1.2982066
-      outSlope: -1.2982066
+      time: 0.99442524
+      value: 0.59254646
+      inSlope: -3.152184
+      outSlope: -3.152184
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.049382724
+      inWeight: 0.04416721
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2

@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: test_ZigZagConcentric 2
   m_EditorClassIdentifier: 
   Type: 1
-  Delta: 0.025
+  Delta: 0.035
   AngularVelocity: 0
-  TimesPerSegment: 8
+  TimesPerSegment: 18

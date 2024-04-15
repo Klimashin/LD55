@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Type: 0
   Delta: 1
-  AngularVelocity: 12
+  AngularVelocity: 25
   TimesPerSegment: 2
