@@ -169,7 +169,7 @@ public class RoundDance : MonoBehaviour
 
             if (IsGameOver)
             {
-                _gameplaySoundSystem.SetLoopTracks(0, new int[]{5});
+                _gameplaySoundSystem.SetLoopTracks(0, new int[]{7});
                 GameOverRoutine().Forget();
                 return;
             }
@@ -268,7 +268,7 @@ public class RoundDance : MonoBehaviour
     private async UniTask DragDancersAway(DanceSegment segment, int count)
     {
         _player.enabled = false;
-        _gameplaySoundSystem.SetLoopTracks(0, new int[]{5});
+        _gameplaySoundSystem.SetLoopTracks(0, new int[]{7});
         var maxTargets = _dancers.Count(d => d.gameObject.activeSelf);
         Assert.IsTrue(count <= maxTargets);
         
@@ -369,6 +369,12 @@ public class DanceSegment
         if (Tracks.HasFlag(TrackNumFlags.Track5))
             flags.Add(4);
         
+        if (Tracks.HasFlag(TrackNumFlags.Track6))
+            flags.Add(5);
+        
+        if (Tracks.HasFlag(TrackNumFlags.Track7))
+            flags.Add(6);
+        
         return flags.ToArray();
     }
     
@@ -380,5 +386,7 @@ public class DanceSegment
         Track3 = 1 << 2,
         Track4 = 1 << 3,
         Track5 = 1 << 4,
+        Track6 = 1 << 5,
+        Track7 = 1 << 6,
     }
 }
