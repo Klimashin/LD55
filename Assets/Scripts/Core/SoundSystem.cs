@@ -43,7 +43,7 @@ public class SoundSystem : ScriptableObject
             _musicAudio.outputAudioMixerGroup = _audioMixer.FindMatchingGroups("Music")[0];
         }
 
-        _musicAudio.DOFade(0f, fadeTime)
+        _musicAudio.DOFade(0f, 0.5f)
             .OnComplete(() =>
             {
                 _musicAudio.clip = clip;

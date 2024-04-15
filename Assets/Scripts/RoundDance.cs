@@ -26,7 +26,9 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private int _maxDraggedDancers = 3;
     [SerializeField] private float _noErrorCooldownAfterDrag = 5f;
     [SerializeField] private float _freeMovementAfterDrag = 2f;
+    [SerializeField] private float _sunDawnTime = 7f;
     [SerializeField] private AudioClip _ambientAudio;
+    [SerializeField] private AudioClip _morningAudio;
 
     private SoundSystem _soundSystem;
     private CameraController _cameraController;
@@ -194,11 +196,13 @@ public class RoundDance : MonoBehaviour
 
     private async UniTaskVoid GameCompletedRoutine()
     {
+        _gameplaySoundSystem.SetLoopTracks(0, new int[]{});
+        _soundSystem.PlayMusicClip(_morningAudio, _sunDawnTime / 2f);
         State = DanceState.Finished;
         ErrorRate = 0f;
         _eyesController.OnErrorRateUpdated(ErrorRate);
         _player.SetLookTransform(null);
-        await _lightsController.SetGlobalIntensity(3f, 2f);
+        await _lightsController.SetGlobalIntensity(3f, _sunDawnTime);
         _lightsController.DisableShadows();
     }
 
