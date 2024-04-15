@@ -144,8 +144,19 @@ public class RoundDance : MonoBehaviour
     {
         _cameraController.SetCamera(CameraController.CameraType.Dance);
         _soundSystem.FadeCurrentMusic(3f);
+        _lightsController.FadeAdditionalLights(3f);
         _player.SetLookTransform(transform);
         State = DanceState.Started;
+
+        _player.enabled = false;
+        
+        await UniTask.Delay(TimeSpan.FromSeconds(3f), DelayType.DeltaTime, PlayerLoopTiming.Update,
+            destroyCancellationToken);
+        
+        _player.enabled = true;
+        
+        await UniTask.Delay(TimeSpan.FromSeconds(1f), DelayType.DeltaTime, PlayerLoopTiming.Update,
+            destroyCancellationToken);
 
         var segmentsQueue = new Queue<DanceSegment>(_danceSegments);
         while (segmentsQueue.Count > 0)
@@ -193,6 +204,8 @@ public class RoundDance : MonoBehaviour
         Dictionary<Dancer, List<IDanceMovementHandler>> handlers = new();
         for (var i = 0; i < _dancers.Length; i++)
         {
+            _dancers[i].SetHandsPos(segment.HandsPos);
+            _player.SetHandsPos(segment.HandsPos);
             var dancerHandlers = new List<IDanceMovementHandler>();
             foreach (var segmentMovement in segment.Movements)
             {
@@ -325,6 +338,7 @@ public class DanceSegment
     public float Duration;
     [Title("Active Tracks")]
     [EnumToggleButtons] public TrackNumFlags Tracks;
+    public Dancer.HandsPos HandsPos = Dancer.HandsPos.Hidden;
     public List<DanceMovement> Movements;
 
     public int[] GetTracks()

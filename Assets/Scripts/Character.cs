@@ -15,6 +15,7 @@ public class Character : MonoBehaviour
     private Camera _camera;
     private float _currentSpeed;
     private static readonly int DressAnimateHash = Animator.StringToHash("AnimateDress");
+    private static readonly int HandsAnimateHash = Animator.StringToHash("Hands");
     [CanBeNull] private Transform _lookTransform;
 
     [Inject]
@@ -26,6 +27,11 @@ public class Character : MonoBehaviour
     public void SetLookTransform([CanBeNull] Transform t)
     {
         _lookTransform = t;
+    }
+    
+    public void SetHandsPos(Dancer.HandsPos handsPos)
+    {
+        _animator.SetInteger(HandsAnimateHash, (int)handsPos);
     }
 
     private void Update()
