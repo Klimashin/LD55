@@ -10,7 +10,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 369429626916580373, guid: a133a17306292e14ea07b9ae8cd3c6fa, type: 3}
       propertyPath: m_InstanceId
-      value: -40204
+      value: -73358
       objectReference: {fileID: 0}
     - target: {fileID: 5917034219532558529, guid: a133a17306292e14ea07b9ae8cd3c6fa, type: 3}
       propertyPath: m_Sprite
@@ -60,10 +60,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 6723921957999837185, guid: a133a17306292e14ea07b9ae8cd3c6fa, type: 3}
-      propertyPath: m_Sprite
-      value: 
-      objectReference: {fileID: 21300000, guid: 3edc4ec10f2e233449b78210b446084e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
