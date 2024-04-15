@@ -16,7 +16,8 @@ public class RoundDance : MonoBehaviour
     [SerializeField] private int _playerPosition;
     [SerializeField] private List<DanceSegment> _danceSegments;
     [SerializeField] private float _initialRadius;
-    [SerializeField] private float _errorDelta = 0.5f;
+    [SerializeField] private float _initialErrorDelta = 0.5f;
+    [SerializeField] private float _errorDelta = 0.3f;
     [SerializeField] private float _errorUpDistanceCoefficient = 3f;
     [SerializeField] private float _errorUpRate = 2f;
     [SerializeField] private float _errorDownRate = 1f;
@@ -113,6 +114,11 @@ public class RoundDance : MonoBehaviour
 
     private bool IsPlayerInPlace()
     {
+        if (State == DanceState.WaitingForPlayer)
+        {
+            return Vector3.Distance(_player.transform.position, PlayerExpectedPosition) < _initialErrorDelta;
+        }
+
         return Vector3.Distance(_player.transform.position, PlayerExpectedPosition) < _errorDelta;
     }
 
