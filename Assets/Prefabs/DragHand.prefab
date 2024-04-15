@@ -47,7 +47,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _armLineRenderer: {fileID: 301204718079513831}
   _hand: {fileID: 5998106804410909954}
-  _wonderTime: 1
+  _wonderTime: 1.5
+  _grabTime: 0.2
+  _grabPrepTime: 0.5
+  _grabPrepOffset: 8
+  _wonderPointOffset: 2
+  _wonderRange: 0.7
+  _grabPointOffset: 0.4
+  _wonderCount: 4
   _appearanceDuration: 2
   _appearanceCurve:
     serializedVersion: 2
@@ -73,7 +80,11 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  _dragDuration: 0.5
+  _dragDuration: 1
+  _sfx:
+  - {fileID: 8300000, guid: 38c54308a244fea4e82915ec0094bc9b, type: 3}
+  - {fileID: 8300000, guid: 9bdf579118510c5419da570fdd3993f2, type: 3}
+  - {fileID: 8300000, guid: 24bf7eea1fa2edf4692651e710ddc99c, type: 3}
 --- !u!1 &5587635188007567504
 GameObject:
   m_ObjectHideFlags: 0

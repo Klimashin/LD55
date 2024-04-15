@@ -16,7 +16,7 @@ public class DragAnimator : MonoBehaviour
         {
             var startPosition = (obj[i].transform.position - center).normalized * _startPointOffset;
             _dragHands[i].gameObject.SetActive(true);
-            tasks.Add(_dragHands[i].Drag(startPosition, obj[i]));
+            tasks.Add(_dragHands[i].Drag(startPosition, obj[i], i != 0));
         }
 
         await UniTask.WhenAll(tasks);

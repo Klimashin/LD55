@@ -9,8 +9,6 @@ public class GameplaySoundLoop : MonoBehaviour
     [SerializeField] private AudioSource[] _tracks;
     [SerializeField] private float _fadeTime = 2f;
 
-    private const float UNMUTE_TIME = 0.5f;
-
     private CancellationTokenSource _cancellationTokenSource;
 
     public void SetActiveTracks(params int[] tracks)
@@ -21,7 +19,7 @@ public class GameplaySoundLoop : MonoBehaviour
         }
         
         _cancellationTokenSource?.Cancel();
-        _cancellationTokenSource = new ();
+        _cancellationTokenSource = new CancellationTokenSource();
         var linkedTokenSource =
             CancellationTokenSource.CreateLinkedTokenSource(_cancellationTokenSource.Token, destroyCancellationToken);
         for (int i = 0; i < _tracks.Length; i++)
@@ -54,10 +52,11 @@ public class GameplaySoundLoop : MonoBehaviour
         }
         
         float time = 0f;
-        while (time < UNMUTE_TIME)
+        float current = track.volume;
+        while (time < fadeTime)
         {
-            _tracks[index].volume = Mathf.Lerp(0f, 1f, time / fadeTime);
-            await UniTask.DelayFrame(1, PlayerLoopTiming.Update, token);
+            _tracks[index].volume = Mathf.Lerp(current, 1f, time / fadeTime);
+            await UniTask.DelayFrame(1, PlayerLoopTiming.Update, token, true);
             time += Time.deltaTime;
         }
 
@@ -73,10 +72,11 @@ public class GameplaySoundLoop : MonoBehaviour
         }
         
         float time = 0f;
+        float current = track.volume;
         while (time < fadeTime)
         {
-            _tracks[index].volume = Mathf.Lerp(1f, 0f, time / fadeTime);
-            await UniTask.DelayFrame(1, PlayerLoopTiming.Update, token);
+            _tracks[index].volume = Mathf.Lerp(current, 0f, time / fadeTime);
+            await UniTask.DelayFrame(1, PlayerLoopTiming.Update, token, true);
             time += Time.deltaTime;
         }
 
